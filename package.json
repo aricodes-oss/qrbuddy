@@ -16,13 +16,28 @@
       "gabbro"
     ],
     "watchapp": {
-      "watchface": true
+      "watchface": false
     },
+    "capabilities": [
+      "configurable"
+    ],
     "messageKeys": [
-      "dummy"
+      "PROTO_VER",
+      "TXN_ID",
+      "CHUNK_TOTAL",
+      "CHUNK_INDEX",
+      "CHUNK_DATA",
+      "RESET"
     ],
     "resources": {
-      "media": []
+      "media": [
+        {
+          "type": "png",
+          "name": "MENU_ICON",
+          "file": "images/menu_icon.png",
+          "menuIcon": true
+        }
+      ]
     }
   }
 }

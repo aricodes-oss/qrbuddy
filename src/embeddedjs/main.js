@@ -1,24 +1,13 @@
-import Poco from "commodetto/Poco";
+// Watchapp entry point (runs on the watch in Moddable XS). Loads persisted
+// config, installs the phone-sync receiver, and builds the Piu UI.
 
-console.log("Hello, Watchface.");
+import model from "./model.js";
+import "./sync.js";
+import { buildApp } from "./ui.js";
 
-let render = new Poco(screen);
+console.log("qrbuddy: starting");
 
-const font = new render.Font("Bitham-Black", 30);
-const black = render.makeColor(0, 0, 0);
-const white = render.makeColor(255, 255, 255);
+model.load();
+buildApp();
 
-function draw() {
-	render.begin();
-	render.fillRectangle(white, 0, 0, render.width, render.height);
-	
-	const msg = (new Date).toTimeString().slice(0, 8);
-	const width = render.getTextWidth(msg, font);
-
-	render.drawText(msg, font, black,
-		(render.width - width) / 2, (render.height - font.height) / 2);
- 
-	render.end();
-}
-
-watch.addEventListener('secondchange', draw);
+console.log("qrbuddy: ui ready");
