@@ -15,7 +15,7 @@ const LABEL_BAND = 28;            // px reserved for the label row (only when sh
 const QR_MAX_VERSION = 10;        // capacity ceiling; bigger = smaller modules
 
 const whiteSkin = new Skin({ fill: "white" });
-const labelStyle = new Style({ font: "24px Gothic", color: "black", horizontal: "center", vertical: "middle" });
+const labelStyle = new Style({ font: "bold 24px Gothic", color: "black", horizontal: "center", vertical: "middle" });
 
 let app, qrPort, label;
 let qrBytes = null;               // Uint8Array, one byte (0/1) per module, row-major
