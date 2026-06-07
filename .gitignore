@@ -3,3 +3,6 @@ build/
 *.pbw
 pebble_screenshot_*.png
 node_modules/
+
+# Generated from src/common/config.html by wscript
+src/common/config-html.js

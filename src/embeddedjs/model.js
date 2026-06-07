@@ -84,7 +84,7 @@ const model = {
 	_applyConfig(cfg) {
 		this.labelPosition = (cfg && cfg.labelPosition === "above") ? "above" : "below";
 		const entries = (cfg && Array.isArray(cfg.entries)) ? cfg.entries : [];
-		this.entries = entries.filter(e => e && typeof e.text === "string" && e.text.length);
+		this.entries = entries.filter(e => e && typeof e.text === "string" && e.text.length && e.visible !== false);
 		if (this.index >= this.entries.length)
 			this.index = 0;
 	},

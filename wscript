@@ -3,10 +3,30 @@
 #
 # Feel free to customize this to your needs.
 #
+import json
 import os.path
 
 top = '.'
 out = 'build'
+
+
+def generate_config_html(ctx):
+    """Bake src/common/config.html into the ES5 module src/common/config-html.js.
+
+    The phone has no filesystem, so the settings page has to ship as a JS string.
+    We author it as a real .html file (editor highlighting, formatters, no quote
+    escaping) and generate the module here, into the source tree, so pkjs's
+    require("../common/config-html") keeps resolving and the src/common/**/*.js
+    bundle glob below picks it up. The generated file is git-ignored; never edit
+    it by hand."""
+    html = ctx.path.find_node('src/common/config.html').read()
+    out_node = ctx.path.make_node('src/common/config-html.js')
+    out_node.write(
+        '// GENERATED from config.html by wscript. Do not edit; edit config.html.\n'
+        '// pkjs replaces the __CONFIG__ token with encodeURIComponent(currentConfigJSON)\n'
+        '// before opening it. On Save the page returns the new config via pebblejs://close.\n'
+        'module.exports = { CONFIG_HTML: ' + json.dumps(html) + ' };\n'
+    )
 
 
 def options(ctx):
@@ -25,6 +45,9 @@ def configure(ctx):
 
 def build(ctx):
     ctx.load('pebble_sdk')
+
+    # Regenerate config-html.js before the bundle glob below scans src/common.
+    generate_config_html(ctx)
 
     build_worker = os.path.exists('worker_src')
     binaries = []
