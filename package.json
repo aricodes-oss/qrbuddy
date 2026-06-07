@@ -26,8 +26,7 @@
       "TXN_ID",
       "CHUNK_TOTAL",
       "CHUNK_INDEX",
-      "CHUNK_DATA",
-      "RESET"
+      "CHUNK_DATA"
     ],
     "resources": {
       "media": [

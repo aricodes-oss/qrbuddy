@@ -36,15 +36,28 @@ Pebble.addEventListener("webviewclosed", function (e) {
 	sendTransaction(s);
 });
 
+// Up to this many tries per chunk before the whole transaction is abandoned.
+var MAX_ATTEMPTS = 5;
+
+// Identifies the transaction currently being sent. Starting a new one supersedes
+// any in-flight send: its sendOne loop sees activeTxn change and stops, so two
+// quick saves can't interleave chunks (which would corrupt the watch's reassembly).
+var activeTxn = null;
+
 // Send the JSON blob as numbered chunks. Each chunk is sent only after the
 // previous one is acknowledged, so we never overrun the watch inbox; failures
-// retry the same chunk after a short backoff.
+// retry the same chunk after a short backoff, up to MAX_ATTEMPTS.
 function sendTransaction(s) {
 	var chunks = protocol.splitChunks(s);
 	var txn = Date.now() & 0x7fffffff;
+	activeTxn = txn;
 	console.log("qrbuddy: sending config txn " + txn + " in " + chunks.length + " chunk(s)");
 
-	function sendOne(i) {
+	function sendOne(i, attempt) {
+		if (txn !== activeTxn) {
+			console.log("qrbuddy: txn " + txn + " superseded, stopping");
+			return;
+		}
 		if (i >= chunks.length) {
 			console.log("qrbuddy: config txn " + txn + " sent");
 			return;
@@ -57,13 +70,17 @@ function sendTransaction(s) {
 				CHUNK_INDEX: i,
 				CHUNK_DATA: chunks[i],
 			},
-			function () { sendOne(i + 1); },
+			function () { sendOne(i + 1, 0); },
 			function () {
-				console.log("qrbuddy: chunk " + i + " failed, retrying");
-				setTimeout(function () { sendOne(i); }, 250);
+				if (attempt + 1 >= MAX_ATTEMPTS) {
+					console.log("qrbuddy: chunk " + i + " failed after " + MAX_ATTEMPTS + " attempts, aborting txn " + txn);
+					return;
+				}
+				console.log("qrbuddy: chunk " + i + " failed, retrying (" + (attempt + 1) + "/" + MAX_ATTEMPTS + ")");
+				setTimeout(function () { sendOne(i, attempt + 1); }, 250);
 			}
 		);
 	}
 
-	sendOne(0);
+	sendOne(0, 0);
 }

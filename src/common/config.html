@@ -46,7 +46,8 @@
     var list = document.getElementById("list");
 
     function esc(s) {
-      return (s == null ? "" : String(s)).replace(/"/g, "&quot;").replace(/</g, "&lt;");
+      // Escape & first so the entities introduced below aren't double-encoded.
+      return (s == null ? "" : String(s)).replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
     }
 
     function addRow(label, text, visible) {

@@ -8,7 +8,7 @@
 import Message from "pebble/message";
 import model from "./model.js";
 
-const KEYS = ["PROTO_VER", "TXN_ID", "CHUNK_TOTAL", "CHUNK_INDEX", "CHUNK_DATA", "RESET"];
+const KEYS = ["PROTO_VER", "TXN_ID", "CHUNK_TOTAL", "CHUNK_INDEX", "CHUNK_DATA"];
 
 let rx = { txn: null, total: 0, parts: [], received: 0 };
 
@@ -23,10 +23,6 @@ new Message({
 		// New transaction (or first message): start a fresh buffer.
 		if (txn !== rx.txn)
 			rx = { txn, total, parts: new Array(total), received: 0 };
-
-		// RESET is a control message that just (re)starts the buffer.
-		if (m.get("RESET"))
-			return;
 
 		const idx = m.get("CHUNK_INDEX") | 0;
 		if (idx >= 0 && idx < rx.total && rx.parts[idx] === undefined) {
